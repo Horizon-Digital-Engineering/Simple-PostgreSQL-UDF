@@ -1,5 +1,5 @@
 
-# Simple PostgreSQL UDF
+# PostgreSQL UDF Example
 
 This repository contains an example of a C User-Defined Function (UDF) for PostgreSQL. The UDF takes a string as input and returns a string as output.
 
@@ -8,6 +8,7 @@ This repository contains an example of a C User-Defined Function (UDF) for Postg
 - `string_udf.c`: The C source file for the UDF.
 - `Makefile`: The makefile to compile the UDF into a shared library.
 - `string_udf--1.0.sql`: The SQL script to create the UDF in PostgreSQL.
+- `string_udf.control`: The control file for the PostgreSQL extension.
 - `Dockerfile`: The Dockerfile to build an image with PostgreSQL and compile the UDF.
 - `.github/workflows/test-udf.yml`: The GitHub Actions workflow to automate testing of the UDF.
 
@@ -21,7 +22,7 @@ This repository contains an example of a C User-Defined Function (UDF) for Postg
 ### Step 1: Compile the UDF
 
 1. **Create the Shared Library:**
-   Place `string_udf.c`, `Makefile`, and `string_udf--1.0.sql` in the same directory. Run the following command to compile the UDF:
+   Place `string_udf.c`, `Makefile`, `string_udf--1.0.sql`, and `string_udf.control` in the same directory. Run the following command to compile the UDF:
    ```sh
    make
    sudo make install
@@ -59,12 +60,55 @@ Ensure you have the `Dockerfile` to build an image with PostgreSQL and required 
 
 Ensure you have the `.github/workflows/test-udf.yml` file to define the GitHub Actions workflow.
 
+### GitHub Actions Workflow File
+
+```yaml
+name: Test PostgreSQL UDF
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker
+        run: docker build -t postgres-udf-test .
+
+      - name: Run PostgreSQL UDF Test
+        run: |
+          # Ensure any previous container is removed
+          docker rm -f postgres-test || true
+
+          # Run the new container with the password
+          docker run -d --name postgres-test -e POSTGRES_PASSWORD=example postgres-udf-test
+
+          # Wait for PostgreSQL to initialize
+          sleep 60
+
+          # Check container logs for troubleshooting
+          docker logs postgres-test
+
+          # Check PostgreSQL is ready
+          until docker exec -u postgres postgres-test pg_isready; do
+            sleep 5
+          done
+
+          # Run the extension creation and test commands
+          docker exec -u postgres postgres-test psql -U postgres -c "CREATE EXTENSION string_udf;"
+          docker exec -u postgres postgres-test psql -U postgres -c "SELECT string_udf('Hello, World!');"
+```
+
 ### Step 3: Push Your Changes
 
 Push the necessary files to your GitHub repository:
 - `string_udf.c`
 - `Makefile`
 - `string_udf--1.0.sql`
+- `string_udf.control`
 - `Dockerfile`
 - `.github/workflows/test-udf.yml`
 
