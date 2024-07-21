@@ -11,6 +11,13 @@ jobs:
         image: postgres:13
         ports:
           - 5432:5432
+        options: > 
+          --health-cmd="pg_isready" 
+          --health-interval=10s 
+          --health-timeout=5s 
+          --health-retries=5
+        env:
+          POSTGRES_PASSWORD: example
 
     steps:
       - name: Checkout code
@@ -24,8 +31,8 @@ jobs:
           # Ensure any previous container is removed
           docker rm -f postgres-test || true
 
-          # Run the new container
-          docker run -d --name postgres-test -p 5432:5432 postgres-udf-test
+          # Run the new container with the password
+          docker run -d --name postgres-test -p 5432:5432 -e POSTGRES_PASSWORD=example postgres-udf-test
 
           # Wait for PostgreSQL to initialize
           sleep 60
@@ -39,5 +46,5 @@ jobs:
           done
 
           # Run the extension creation and test commands
-          docker exec -u postgres postgres-test psql -c "CREATE EXTENSION string_udf;"
-          docker exec -u postgres postgres-test psql -c "SELECT string_udf('Hello, World!');"
+          docker exec -u postgres postgres-test psql -U postgres -c "CREATE EXTENSION string_udf;"
+          docker exec -u postgres postgres-test psql -U postgres -c "SELECT string_udf('Hello, World!');"
