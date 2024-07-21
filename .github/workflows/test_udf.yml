@@ -21,7 +21,23 @@ jobs:
 
       - name: Run PostgreSQL UDF Test
         run: |
+          # Ensure any previous container is removed
+          docker rm -f postgres-test || true
+
+          # Run the new container
           docker run -d --name postgres-test -p 5432:5432 postgres-udf-test
-          sleep 20 # Wait for PostgreSQL to initialize
+
+          # Wait for PostgreSQL to initialize
+          sleep 60
+
+          # Check container logs for troubleshooting
+          docker logs postgres-test
+
+          # Check PostgreSQL is ready
+          until docker exec -u postgres postgres-test pg_isready; do
+            sleep 5
+          done
+
+          # Run the extension creation and test commands
           docker exec -u postgres postgres-test psql -c "CREATE EXTENSION string_udf;"
           docker exec -u postgres postgres-test psql -c "SELECT string_udf('Hello, World!');"
