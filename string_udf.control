@@ -1,0 +1,6 @@
+# string_udf.control
+# The comment character for the control file is "#"
+comment = 'Example string UDF'
+default_version = '1.0'
+module_pathname = '$libdir/string_udf'
+relocatable = true
