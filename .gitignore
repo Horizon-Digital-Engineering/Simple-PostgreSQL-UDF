@@ -1,0 +1,62 @@
+
+# Compiled object files
+*.o
+
+# Compiled dynamic libraries
+*.so
+
+# Executable files
+*.out
+*.exe
+
+# PostgreSQL data directories
+pgdata/
+pglogs/
+
+# Docker files
+docker-compose.yml
+docker-compose.override.yml
+*.tar
+
+# Dependency directories
+node_modules/
+vendor/
+
+# Python compiled files
+*.pyc
+*.pyo
+__pycache__/
+
+# Log files
+*.log
+
+# Mac OS X
+.DS_Store
+
+# Vim swap files
+*.swp
+
+# JetBrains IDEs
+.idea/
+*.iml
+
+# Visual Studio Code
+.vscode/
+
+# GitHub Actions
+.github/
+
+# Exclude GitHub Actions workflow files explicitly
+!/.github/workflows/
+
+# Exclude SQL files explicitly
+!*.sql
+
+# Exclude Makefiles explicitly
+!Makefile
+
+# Exclude C source files explicitly
+!*.c
+
+# Exclude README files explicitly
+!README.md
