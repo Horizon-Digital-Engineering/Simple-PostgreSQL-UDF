@@ -8,10 +8,11 @@ RUN apt-get update && apt-get install -y \
 # Create a directory for the source files with the necessary permissions
 RUN mkdir -p /usr/local/src/udf
 
-# Copy UDF source and makefile into the container
+# Copy UDF source, control, and makefile into the container
 COPY string_udf.c /usr/local/src/udf/
 COPY Makefile /usr/local/src/udf/
 COPY string_udf--1.0.sql /usr/local/src/udf/
+COPY string_udf.control /usr/local/src/udf/
 
 # Change ownership to the postgres user
 RUN chown -R postgres:postgres /usr/local/src/udf
