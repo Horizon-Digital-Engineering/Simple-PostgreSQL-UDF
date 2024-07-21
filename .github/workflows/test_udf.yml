@@ -1,0 +1,33 @@
+
+name: Test PostgreSQL UDF
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:13
+        ports:
+          - 5432:5432
+        options: > 
+          --health-cmd="pg_isready -U postgres" 
+          --health-interval=10s 
+          --health-timeout=5s 
+          --health-retries=5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker
+        run: docker build -t postgres-udf-test .
+
+      - name: Run PostgreSQL UDF Test
+        run: |
+          docker run -d --name postgres-test -p 5432:5432 postgres-udf-test
+          sleep 20 # Wait for PostgreSQL to initialize
+          docker exec -u postgres postgres-test psql -c "CREATE EXTENSION string_udf;"
+          docker exec -u postgres postgres-test psql -c "SELECT string_udf('Hello, World!');"
