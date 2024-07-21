@@ -6,14 +6,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:13
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_PASSWORD: example
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -27,7 +19,7 @@ jobs:
           docker rm -f postgres-test || true
 
           # Run the new container with the password
-          docker run -d --name postgres-test -p 5432:5432 -e POSTGRES_PASSWORD=example postgres-udf-test
+          docker run -d --name postgres-test -e POSTGRES_PASSWORD=example postgres-udf-test
 
           # Wait for PostgreSQL to initialize
           sleep 60
