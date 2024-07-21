@@ -17,14 +17,23 @@ COPY string_udf.control /usr/local/src/udf/
 # Change ownership to the postgres user
 RUN chown -R postgres:postgres /usr/local/src/udf
 
-# Switch to user postgres to avoid permission issues
+# Switch to user postgres for compiling
 USER postgres
 
 # Set working directory
 WORKDIR /usr/local/src/udf
 
 # Build the UDF
-RUN make && make install
+RUN make
+
+# Switch back to root for installation
+USER root
+
+# Install the UDF
+RUN make install
+
+# Switch back to postgres user
+USER postgres
 
 # Start the PostgreSQL server
 CMD ["postgres"]
